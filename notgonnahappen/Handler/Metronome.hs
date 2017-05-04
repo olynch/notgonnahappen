@@ -11,12 +11,12 @@ getMetronomeR = do
              Nothing -> return []
   let loggedIn = isJust mUserId
   defaultLayout $ do
-    let (metronomeCanvasId, tempoId, startStopId, songChooserId) = metronomeIds
+    let (metronomeCanvasId, tempoId, tempoOutputId, startStopId, songChooserId) = metronomeIds
     setTitle "Metronome -- Not Gonna Happen"
     $(widgetFile "metronome")
 
-metronomeIds :: (Text, Text, Text, Text)
-metronomeIds = ("js-metronomeCanvasId", "js-tempoId", "js-startStopId", "js-songChooserId")
+metronomeIds :: (Text, Text, Text, Text, Text)
+metronomeIds = ("js-metronomeCanvasId", "js-tempoId", "js-tempoOutputId", "js-startStopId", "js-songChooserId")
 
 postMetronomeR :: Handler Value
 postMetronomeR = do

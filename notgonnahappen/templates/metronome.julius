@@ -34,11 +34,11 @@ function drawNeedle(myRectangle, theta, context) {
     context.lineTo(newCorners[i].x, newCorners[i].y);
   }
 
-  context.fillStyle = '#8ED6FF';
+  context.fillStyle = '#000000';
   context.fill();
-  context.lineWidth = myRectangle.borderWidth;
-  context.strokeStyle = 'black';
-  context.stroke();
+  /* context.lineWidth = myRectangle.borderWidth; */
+  /* context.strokeStyle = 'black'; */
+  /* context.stroke(); */
 }
 
 function bpmToAngularSpeed(bpm) {
@@ -105,8 +105,8 @@ $(function() {
   var context = canvas.getContext('2d');
 
   var myRectangle = {
-    corners: [{ x: -10, y: 50 }, { x: 10, y: 50 },
-    { x: 10, y: -150 }, { x: -10, y: -150 }],
+    corners: [{ x: -6, y: 50 }, { x: 6, y: 50 },
+    { x: 2, y: -150 }, { x: -2, y: -150 }],
     axisGlobal: { x: 250, y: 150 }
   };
 
@@ -156,4 +156,8 @@ $(function() {
       startTime = newTime;
     }
   });
+  $("##{rawJS tempoId}").on("input", function(value) {
+    $("##{rawJS tempoOutputId}").text($("##{rawJS tempoId}").val());
+  });
+
 });

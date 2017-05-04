@@ -1,14 +1,26 @@
 <div .container>
   <div .row>
-    <div .col-lg-12>
-      <canvas ##{metronomeCanvasId} width=500 height=250>
-  <div .row>
+    <div .col-lg-2>
     <div .col-lg-6>
-      <input ##{tempoId} type=range min=30 max=216 name=tempo>
-    <div .col-lg-6>
-      <select ##{songChooserId}>
-        $forall Entity sid (Song title _) <- songs
-          <option value=#{toPathPiece sid}>#{title}
-  <div .row>
-    <div .col-lg-12>
-      <button ##{startStopId}>Start
+      <div .row>
+      <div .col-lg-12>
+        <canvas ##{metronomeCanvasId} width=550 height=250>
+      <div .row>
+        <div .form-group>
+          <label .col-lg-2 for=#{tempoId} .control-label>Tempo: 
+          <div .col-lg-8>
+            <input ##{tempoId} type=range min=30 max=216 name=tempo>
+          <div .col-lg-2>
+            <a href="#" id="#{tempoOutputId}" .btn .btn-primary .disabled .btn-block role=button>123
+      <div .row>
+        <div .col-lg-12>
+          <p>&nbsp;
+      <div .row>
+        <div .form-group>
+          <label .col-lg-2 for=#{songChooserId} .control-label>Song: 
+          <div .col-lg-8>
+            <select ##{songChooserId} .select .form-control>
+              $forall Entity sid (Song title _) <- songs
+                <option value=#{toPathPiece sid}>#{title}
+          <div .col-lg-2>
+            <button ##{startStopId} .btn .btn-block>Start

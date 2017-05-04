@@ -32,5 +32,5 @@ database:
   database: "_env:PGDATABASE:notgonnahappen_LOWER"
   poolsize: "_env:PGPOOLSIZE:10"
 
-copyright: "(c) Owen Lynch 2017"
+copyright: ""
 #analytics: UA-YOURCODE
