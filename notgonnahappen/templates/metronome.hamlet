@@ -1,0 +1,14 @@
+<div .container>
+  <div .row>
+    <div .col-lg-12>
+      <canvas ##{metronomeCanvasId} width=500 height=250>
+  <div .row>
+    <div .col-lg-6>
+      <input ##{tempoId} type=range min=30 max=216 name=tempo>
+    <div .col-lg-6>
+      <select ##{songChooserId}>
+        $forall Entity sid (Song title _) <- songs
+          <option value=#{toPathPiece sid}>#{title}
+  <div .row>
+    <div .col-lg-12>
+      <button ##{startStopId}>Start

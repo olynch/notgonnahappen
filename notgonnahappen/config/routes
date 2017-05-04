@@ -4,8 +4,9 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET POST
+/ HomeR GET
+/nome MetronomeR GET POST
+/log LogR GET
+/calendar/#SongId/#Int/#Int CalendarR GET
 
--- /comments CommentR POST
-
-/profile ProfileR GET
+/randomCal/#Int/#Int RandomCalR GET

@@ -6,13 +6,16 @@ let
 
   f = { mkDerivation, aeson, base, bytestring, case-insensitive
       , classy-prelude, classy-prelude-conduit, classy-prelude-yesod
-      , conduit, containers, data-default, directory, fast-logger
-      , file-embed, hjsmin, hspec, http-conduit, monad-control
-      , monad-logger, persistent, persistent-postgresql
-      , persistent-template, resourcet, safe, shakespeare, stdenv
-      , template-haskell, text, time, transformers, unordered-containers
-      , vector, wai, wai-extra, wai-logger, warp, yaml, yesod, yesod-auth
-      , yesod-core, yesod-form, yesod-static, yesod-test
+      , colour, conduit, containers, data-default, diagrams
+      , diagrams-cairo, diagrams-contrib, diagrams-core, diagrams-lib
+      , diagrams-svg, directory, esqueleto, fast-logger, file-embed
+      , foreign-store, hjsmin, hspec, http-conduit, lens, monad-control
+      , monad-logger, mwc-random, persistent, persistent-postgresql
+      , persistent-template, resourcet, safe, shakespeare, statistics
+      , stdenv, svg-builder, template-haskell, text, time, transformers
+      , unordered-containers, vector, wai, wai-extra, wai-logger, warp
+      , yaml, yesod, yesod-auth, yesod-core, yesod-form, yesod-static
+      , yesod-test
       }:
       mkDerivation {
         pname = "notgonnahappen";
@@ -22,10 +25,13 @@ let
         isExecutable = true;
         libraryHaskellDepends = [
           aeson base bytestring case-insensitive classy-prelude
-          classy-prelude-conduit classy-prelude-yesod conduit containers
-          data-default directory fast-logger file-embed hjsmin http-conduit
-          monad-control monad-logger persistent persistent-postgresql
-          persistent-template safe shakespeare template-haskell text time
+          classy-prelude-conduit classy-prelude-yesod colour conduit
+          containers data-default diagrams diagrams-cairo diagrams-contrib
+          diagrams-core diagrams-lib diagrams-svg directory esqueleto
+          fast-logger file-embed foreign-store hjsmin http-conduit lens
+          monad-control monad-logger mwc-random persistent
+          persistent-postgresql persistent-template safe shakespeare
+          statistics svg-builder template-haskell text time
           unordered-containers vector wai wai-extra wai-logger warp yaml
           yesod yesod-auth yesod-core yesod-form yesod-static
         ];

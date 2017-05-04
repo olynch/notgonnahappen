@@ -14,15 +14,19 @@ Flag library-only
 library
     hs-source-dirs: ., app
     exposed-modules: Application
+                     Calendar
                      Foundation
                      Import
                      Import.NoFoundation
                      Model
                      Settings
                      Settings.StaticFiles
+                     Seed
                      Handler.Common
                      Handler.Home
-                     Handler.Profile
+                     Handler.Metronome
+                     Handler.Log
+                     Handler.RandomCal
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -92,6 +96,20 @@ library
                  , time
                  , case-insensitive
                  , wai
+                 , diagrams
+                 , diagrams-lib
+                 , diagrams-core
+                 , diagrams-svg
+                 , diagrams-contrib
+                 , diagrams-cairo
+                 , colour
+                 , svg-builder
+                 , esqueleto
+                 , statistics
+                 , mwc-random
+                 , lens
+                 , foreign-store
+                 , aeson
 
 executable         notgonnahappen
     if flag(library-only)

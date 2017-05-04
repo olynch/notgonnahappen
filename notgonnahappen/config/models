@@ -2,24 +2,22 @@ User
     ident Text
     password Text Maybe
     UniqueUser ident
-    deriving Typeable
+    deriving Typeable Show
 Email
     email Text
     userId UserId Maybe
     verkey Text Maybe
     UniqueEmail email
--- Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
---     message Text
---     userId UserId Maybe
---     deriving Eq
---     deriving Show
+    deriving Show
 Song
     title Text
     userId UserId
+    deriving Show
 Session
     start UTCTime
     end UTCTime
     tempo Int
-    songId UserId
+    songId SongId
+    deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

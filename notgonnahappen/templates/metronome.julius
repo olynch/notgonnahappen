@@ -1,0 +1,159 @@
+window.requestAnimFrame = (function(callback) {
+  return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+    function(callback) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+})();
+
+function playSound(buffer) {
+  var source = window.audioContext.createBufferSource(); // creates a sound source
+  source.buffer = buffer;                    // tell the source which sound to play
+  source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
+  source.start(0);                           // play the source now
+}
+
+function rotateR2(v, theta) {
+  let cos_t = Math.cos(theta);
+  let sin_t = Math.sin(theta);
+  return { x: cos_t * v.x - sin_t * v.y, y: sin_t * v.x + cos_t * v.y };
+}
+
+function addR2(v1, v2) {
+  return { x: v1.x + v2.x, y: v1.y + v2.y };
+}
+
+
+function drawNeedle(myRectangle, theta, context) {
+  context.beginPath();
+  let newCorners = myRectangle.corners.map(function(corner) {
+    return addR2(rotateR2(corner, theta), myRectangle.axisGlobal);
+  });
+  context.moveTo(newCorners[3].x, newCorners[3].y);
+
+  for (var i = 0; i <= 3; i++) {
+    context.lineTo(newCorners[i].x, newCorners[i].y);
+  }
+
+  context.fillStyle = '#8ED6FF';
+  context.fill();
+  context.lineWidth = myRectangle.borderWidth;
+  context.strokeStyle = 'black';
+  context.stroke();
+}
+
+function bpmToAngularSpeed(bpm) {
+  return bpm / (6000 * Math.PI);
+}
+
+$(function() {
+  window.clickBuffer = null;
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  window.audioContext = new AudioContext();
+  var clickURL = "/static/click/click.wav";
+
+  function loadClickSound(url) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+
+    // Decode asynchronously
+    request.onload = function() {
+      audioContext.decodeAudioData(request.response, function(buffer) {
+        window.clickBuffer = buffer;
+      }, function(err) {console.log(err);});
+      console.log("Loaded");
+    }
+    request.send();
+  }
+  loadClickSound(clickURL);
+});
+
+$(function() {
+  var metronomeRunning = false;
+  var startTimeLog = null;
+
+  var goingRight = true;
+  var prevTheta = null;
+  var theta = 0.0;
+  var bpm = (30 + 216) / 2;
+
+  function animate(myRectangle, canvas, context, startTime) {
+    // update
+    var time = (new Date()).getTime() - startTime;
+
+    prevTheta = theta;
+    theta = Math.cos(bpmToAngularSpeed(bpm) * (time - startTime));
+
+    if ((goingRight && prevTheta < theta) || (!goingRight && prevTheta > theta)) {
+      playSound(window.clickBuffer);
+      goingRight = !goingRight;
+    }
+
+    // clear
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawNeedle(myRectangle, theta, context);
+
+    // request new frame
+    if (metronomeRunning) {
+      requestAnimFrame(function() {
+        animate(myRectangle, canvas, context, startTime);
+      });
+    }
+  }
+  var canvas = document.getElementById("#{rawJS metronomeCanvasId}");
+  var context = canvas.getContext('2d');
+
+  var myRectangle = {
+    corners: [{ x: -10, y: 50 }, { x: 10, y: 50 },
+    { x: 10, y: -150 }, { x: -10, y: -150 }],
+    axisGlobal: { x: 250, y: 150 }
+  };
+
+  drawNeedle(myRectangle, 0, context);
+
+  // wait one second before starting animation
+
+  function logSession(endTime) {
+    if (#{rawJS loggedIn}) {
+      $.ajax({
+        url: '@{MetronomeR}',
+        type: 'POST',
+        contentType: "application/json",
+        data: JSON.stringify({
+          tempo: Number($("##{rawJS tempoId}").val()),
+          songId: Number($("##{rawJS songChooserId}").val()),
+          start: startTimeLog,
+          end: endTime
+        }),
+        success: function (data) {
+        },
+        error: function (data) {
+        }
+      });
+    }
+  }
+  $("##{rawJS startStopId}").click(function(event) {
+    event.preventDefault();
+    if (metronomeRunning) {
+      logSession(new Date());
+      metronomeRunning = false;
+      startTimeLog = null;
+      $("##{rawJS startStopId}").text("Start");
+    } else {
+      metronomeRunning = true;
+      startTimeLog = new Date();
+      $("##{rawJS startStopId}").text("Stop");
+      let startTime = (new Date()).getTime();
+      animate(myRectangle, canvas, context, startTime);
+    }
+  });
+  $("##{rawJS tempoId}").change(function(event) {
+    bpm = $("##{rawJS tempoId}").val();
+    if (metronomeRunning) {
+      var newTime = new Date();
+      logSession(newTime);
+      startTime = newTime;
+    }
+  });
+});

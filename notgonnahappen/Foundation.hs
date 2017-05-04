@@ -27,6 +27,12 @@ data App = App
     , appLogger      :: Logger
     }
 
+maxTempo, minTempo :: Double
+maxTempo = 216
+minTempo = 30
+
+type PracticeDay = [(Double, Double)]
+
 data MenuItem = MenuItem
     { menuItemLabel :: Text
     , menuItemRoute :: Route App
@@ -86,8 +92,6 @@ instance Yesod App where
         muser <- maybeAuthPair
         mcurrentRoute <- getCurrentRoute
 
-        -- Get the breadcrumbs, as defined in the YesodBreadcrumbs instance.
-        (title, parents) <- breadcrumbs
 
         -- Define the menu items of the header.
         let menuItems =
@@ -97,8 +101,13 @@ instance Yesod App where
                     , menuItemAccessCallback = True
                     }
                 , NavbarLeft $ MenuItem
-                    { menuItemLabel = "Profile"
-                    , menuItemRoute = ProfileR
+                    { menuItemLabel = "Metronome"
+                    , menuItemRoute = MetronomeR
+                    , menuItemAccessCallback = True
+                    }
+                , NavbarLeft $ MenuItem
+                    { menuItemLabel = "Log"
+                    , menuItemRoute = LogR
                     , menuItemAccessCallback = isJust muser
                     }
                 , NavbarRight $ MenuItem
@@ -135,13 +144,15 @@ instance Yesod App where
 
     -- Routes not requiring authentication.
     isAuthorized (AuthR _) _ = return Authorized
-    isAuthorized CommentR _ = return Authorized
     isAuthorized HomeR _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
-
-    isAuthorized ProfileR _ = isAuthenticated
+    isAuthorized MetronomeR _ = return Authorized
+    isAuthorized (RandomCalR _ _) _ = return Authorized
+    
+    isAuthorized (CalendarR _ _ _) _ = isAuthenticated
+    isAuthorized LogR _ = isAuthenticated
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -174,13 +185,6 @@ instance Yesod App where
     -- Provide proper Bootstrap styling for default displays, like
     -- error pages
     defaultMessageWidget title body = $(widgetFile "default-message-widget")
-
--- Define breadcrumbs.
-instance YesodBreadcrumbs App where
-  breadcrumb HomeR = return ("Home", Nothing)
-  breadcrumb (AuthR _) = return ("Login", Just HomeR)
-  breadcrumb ProfileR = return ("Profile", Just HomeR)
-  breadcrumb  _ = return ("home", Nothing)
 
 -- How to run database actions.
 instance YesodPersist App where

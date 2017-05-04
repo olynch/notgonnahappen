@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <!-- <style> -->
+    <!--   body { -->
+    <!--     margin: 0px; -->
+    <!--     padding: 0px; -->
+    <!--   } -->
+    <!-- </style> -->
+  </head>
+  <body>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script>
+// var context;
+// window.addEventListener('load', init, false);
+// function init() {
+//   try {
+//     // Fix up for prefixing
+//     window.AudioContext = window.AudioContext||window.webkitAudioContext;
+//     context = new AudioContext();
+//   }
+//   catch(e) {
+//     alert('Web Audio API is not supported in this browser');
+//   }
+// }
+var clickBuffer = null;
+// Fix up prefixing
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioContext = new AudioContext();
+var clickURL = "/click.wav";
+
+function loadClickSound(url) {
+  var request = new XMLHttpRequest();
+  request.open('GET', url, true);
+  request.responseType = 'arraybuffer';
+
+  // Decode asynchronously
+  request.onload = function() {
+    audioContext.decodeAudioData(request.response, function(buffer) {
+      clickBuffer = buffer;
+    }, function(err) {console.log(err);});
+    console.log("Loaded");
+  }
+  request.send();
+}
+loadClickSound(clickURL);
+function playSound(buffer) {
+  var source = audioContext.createBufferSource(); // creates a sound source
+  source.buffer = buffer;                    // tell the source which sound to play
+  source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
+  source.start(0);                           // play the source now
+}
+    </script>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <script>
+window.requestAnimFrame = (function(callback) {
+  return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+    function(callback) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+})();
+
+function rotateR2(v, theta) {
+  let cos_t = Math.cos(theta);
+  let sin_t = Math.sin(theta);
+  return { x: cos_t * v.x - sin_t * v.y, y: sin_t * v.x + cos_t * v.y };
+}
+
+function addR2(v1, v2) {
+  return { x: v1.x + v2.x, y: v1.y + v2.y };
+}
+
+
+function drawNeedle(myRectangle, theta, context) {
+  context.beginPath();
+  let newCorners = myRectangle.corners.map(function(corner) {
+    return addR2(rotateR2(corner, theta), myRectangle.axisGlobal);
+  });
+  context.moveTo(newCorners[3].x, newCorners[3].y);
+
+  for (var i = 0; i <= 3; i++) {
+    context.lineTo(newCorners[i].x, newCorners[i].y);
+  }
+
+  context.fillStyle = '#8ED6FF';
+  context.fill();
+  context.lineWidth = myRectangle.borderWidth;
+  context.strokeStyle = 'black';
+  context.stroke();
+}
+
+function bpmToAngularSpeed(bpm) {
+  return bpm / (6000 * Math.PI);
+}
+var goingRight = true;
+var prevTheta = null;
+var theta = 0.0;
+var bpm = 216;
+
+function animate(myRectangle, canvas, context, startTime) {
+  // update
+  var time = (new Date()).getTime() - startTime;
+
+  prevTheta = theta;
+  theta = Math.cos(bpmToAngularSpeed(bpm) * (time - startTime));
+
+  if ((goingRight && prevTheta < theta) || (!goingRight && prevTheta > theta)) {
+    playSound(clickBuffer);
+    goingRight = !goingRight;
+  }
+
+  // clear
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawNeedle(myRectangle, theta, context);
+
+  // request new frame
+  if (!stopped) {
+    requestAnimFrame(function() {
+      animate(myRectangle, canvas, context, startTime);
+    });
+  }
+}
+var canvas = document.getElementById('myCanvas');
+var context = canvas.getContext('2d');
+
+var myRectangle = {
+  corners: [{ x: -10, y: 50 }, { x: 10, y: 50 },
+  { x: 10, y: -150 }, { x: -10, y: -150 }],
+  axisGlobal: { x: 250, y: 150 }
+};
+
+drawNeedle(myRectangle, 0, context);
+
+// wait one second before starting animation
+setTimeout(function() {
+  var startTime = (new Date()).getTime();
+  animate(myRectangle, canvas, context, startTime);
+}, 1000);
+    </script>
+  </body>
+</html>      
